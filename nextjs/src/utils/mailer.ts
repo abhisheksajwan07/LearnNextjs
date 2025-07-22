@@ -1,4 +1,6 @@
+import { User } from "@/models/userModel";
 import nodemailer from "nodemailer";
+import bcryptjs from "bcryptjs";
 interface EmailOptions {
   emailId: string;
   emailType: "VERIFY" | "RESET" | "WELCOME";
@@ -10,6 +12,18 @@ export const sendEmail = async ({
   userId,
 }: EmailOptions): Promise<void> => {
   try {
+    const hashedToken = await bcryptjs.hash(userId, 10);
+    if (emailId === "VERIFY") {
+      await User.findByIdAndUpdate(userId, {
+        verifyToken: hashedToken,
+        verifyTokenExpiry: Date.now() + 3600000,
+      });
+    } else if (emailType === "RESET") {
+      await User.findByIdAndUpdate(userId, {
+        forgotPasswordToken: hashedToken,
+        forgotPasswordTokenExpiry: Date.now() + 3600000,
+      });
+    }
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST!,
       port: Number(process.env.MAIL_PORT!) || 587,
@@ -24,7 +38,7 @@ export const sendEmail = async ({
       subject = "Verify your Email";
       html = `
         <p>Please click the link below to verify your email:</p>
-        <a href="http://localhost:3000/verify-email?userId=${userId}">Verify Email</a>
+        <a href="http://localhost:3000/verify-email?token=${hashedToken}&userId=${userId}">Verify Email</a>
       `;
     } else if (emailType === "RESET") {
       subject = "Reset your password";

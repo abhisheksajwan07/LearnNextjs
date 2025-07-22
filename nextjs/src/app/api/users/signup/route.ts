@@ -8,7 +8,7 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = request.json();
-    const { username, emailId, password } = reqBody;
+    const { username, emailId, password } = await reqBody;
     const user = await User.findOne({ emailId });
     if (user) {
       return NextResponse.json(
@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
       message: "User registered successfully",
       success: true,
       user:{
-        id:newUser._id,
-        emailId: newUser.emailId,
+        id:savedUser._id,
+        emailId: savedUser.emailId,
       }
     },{status:201});
   } catch (error: any) {
