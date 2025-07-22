@@ -1,5 +1,6 @@
 import { connect } from "@/dbConfig/dbConfig";
 import {User} from "@/models/userModel";
+import { sendEmail } from "@/utils/mailer";
 import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 connect();
