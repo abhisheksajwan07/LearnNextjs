@@ -1,5 +1,5 @@
 import { connect } from "@/dbConfig/dbConfig";
-import {User} from "@/models/userModel";
+import { User } from "@/models/userModel";
 import { sendEmail } from "@/utils/mailer";
 import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,8 +7,7 @@ connect();
 
 export async function POST(request: NextRequest) {
   try {
-    const reqBody = request.json();
-    const { username, emailId, password } = await reqBody;
+    const { userName, emailId, password } = await request.json();
     const user = await User.findOne({ emailId });
     if (user) {
       return NextResponse.json(
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
     const newUser = new User({
-      username,
+      userName,
       emailId,
       password: hashedPassword,
     });
@@ -33,14 +32,17 @@ export async function POST(request: NextRequest) {
       emailType: "VERIFY",
       userId: savedUser._id.toString(),
     });
-    return NextResponse.json({
-      message: "User registered successfully",
-      success: true,
-      user:{
-        id:savedUser._id,
-        emailId: savedUser.emailId,
-      }
-    },{status:201});
+    return NextResponse.json(
+      {
+        message: "User registered successfully",
+        success: true,
+        user: {
+          id: savedUser._id,
+          emailId: savedUser.emailId,
+        },
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     return NextResponse.json(
       {
