@@ -13,7 +13,10 @@ export const sendEmail = async ({
 }: EmailOptions): Promise<void> => {
   try {
     const hashedToken = await bcryptjs.hash(userId, 10);
-    if (emailId === "VERIFY") {
+    console.log("mail", userId);
+    console.log("email type", emailType);
+    console.log(typeof emailType);
+    if (emailType === "VERIFY") {
       await User.findByIdAndUpdate(userId, {
         verifyToken: hashedToken,
         verifyTokenExpiry: Date.now() + 3600000,
@@ -38,7 +41,8 @@ export const sendEmail = async ({
       subject = "Verify your Email";
       html = `
         <p>Please click the link below to verify your email:</p>
-        <a href="http://localhost:3000/verify-email?token=${hashedToken}&userId=${userId}">Verify Email</a>
+        <a href="http://localhost:3000/verify-email?token=${hashedToken}">Verify Email</a>
+        <br> <p>link:"http://localhost:3000/verifyemail?token=${hashedToken}</p>
       `;
     } else if (emailType === "RESET") {
       subject = "Reset your password";
@@ -53,8 +57,9 @@ export const sendEmail = async ({
       subject,
       html,
     };
-    await transporter.sendMail(options);
+    const mailresponse = await transporter.sendMail(options);
     console.log(`email send to ${emailId}`);
+    return mailresponse
   } catch (err) {
     console.error("❌ Error sending email:", err);
     throw new Error("Failed to send email.");

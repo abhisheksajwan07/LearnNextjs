@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
     });
     if (!user) {
       return NextResponse.json(
-        { err: err.message },
+        { err:"invalid token" },
         {
-          status: 500,
+          status: 400,
         }
       );
     }
