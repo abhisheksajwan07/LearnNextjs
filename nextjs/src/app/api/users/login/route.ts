@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const { emailId, password } = reqBody;
-    const user = await User.findOne(emailId);
+    const user = await User.findOne({emailId});
     if (!user) {
       return NextResponse.json(
         {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       emailId: user.emailId,
     };
     const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: "1hr",
+      expiresIn: "1h",
     });
     const response = NextResponse.json({
       message: "Logged In Success",
@@ -44,5 +44,13 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
     });
     return response;
-  } catch (err) {}
+  } catch (err) {
+    console.error("Login error:", err);
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+      },
+      { status: 500 }
+    );
+  }
 }
