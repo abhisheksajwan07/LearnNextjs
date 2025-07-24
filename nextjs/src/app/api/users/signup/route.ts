@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       emailId,
       emailType: "VERIFY",
-      userId: savedUser._id.toString(),
+      userId: savedUser._id,
     });
     return NextResponse.json(
       {
