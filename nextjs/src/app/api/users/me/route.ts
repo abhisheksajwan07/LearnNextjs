@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDataFromToken } from "@/utils/getDataFromToken";
 connect();
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const userId = await getDataFromToken(request);
   const user = await User.findOne({
     _id: userId,
